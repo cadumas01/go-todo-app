@@ -1,4 +1,4 @@
-import { Box, List, ThemeIcon } from "@mantine/core";
+import { Box, List, ThemeIcon, Text } from "@mantine/core";
 import { CheckCircleFillIcon } from "@primer/octicons-react";
 import useSWR from "swr";
 import "./App.css";
@@ -10,7 +10,7 @@ export interface Todo {
   body: string;
   done: boolean;
 }
-
+// this is the ip and port for server
 export const ENDPOINT = "http://localhost:4000";
 
 const fetcher = (url: string) =>
@@ -27,20 +27,27 @@ function App() {
     mutate(updated);
   }
 
+  async function toggleDone(id: number) {
+    const updated = await fetch(`${ENDPOINT}/api/todos/${id}/toggle`, {
+      method: "PATCH",
+    }).then((r) => r.json());
+
+    mutate(updated);
+  }
   return (
     <Box
       sx={(theme) => ({
         padding: "2rem",
         width: "100%",
-        maxWidth: "40rem",
+        maxWidth: "100rem",
         margin: "0 auto",
       })}
     >
-      <List spacing="xs" size="sm" mb={12} center>
+      <List size="lg" fz="xl" mb={12} center >
         {data?.map((todo) => {
           return (
             <List.Item
-              onClick={() => markTodoAsDone(todo.id)}
+              onClick={() => toggleDone(todo.id)}
               key={`todo_list__${todo.id}`}
               icon={
                 todo.done ? (
@@ -53,8 +60,12 @@ function App() {
                   </ThemeIcon>
                 )
               }
+              mb={10}
             >
               {todo.title}
+              <List size="xs">
+                  {todo.body}
+              </List>
             </List.Item>
           );
         })}
